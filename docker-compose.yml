@@ -5,8 +5,6 @@
 #   Production:  DOCKER_TARGET=production docker-compose up --build
 #   With local services: docker-compose --profile local-storage --profile cache up
 
-version: '3.8'
-
 services:
   app:
     build:
@@ -14,7 +12,7 @@ services:
       dockerfile: Dockerfile
       target: ${DOCKER_TARGET:-development}
     ports:
-      - "${APP_PORT:-3000}:3000"
+      - '0.0.0.0:${APP_PORT:-3000}:3000'
     env_file:
       - .env
     volumes:
@@ -25,7 +23,7 @@ services:
       - tierlist-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      test: ['CMD', 'curl', '-f', 'http://localhost:3000']
       interval: 30s
       timeout: 10s
       retries: 3
@@ -34,9 +32,9 @@ services:
   caddy:
     image: caddy:2-alpine
     ports:
-      - "${HTTP_PORT:-80}:80"
-      - "${HTTPS_PORT:-443}:443"
-      - "${CADDY_ADMIN_PORT:-2019}:2019"
+      - '${HTTP_PORT:-80}:80'
+      - '${HTTPS_PORT:-443}:443'
+      - '${CADDY_ADMIN_PORT:-2019}:2019'
     environment:
       - DOMAIN=${DOMAIN:-localhost}
     volumes:
@@ -59,8 +57,8 @@ services:
       MINIO_ROOT_USER: ${S3_ACCESS_KEY:-minioadmin}
       MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY:-minioadmin123}
     ports:
-      - "${S3_PORT:-9000}:9000"
-      - "${S3_CONSOLE_PORT:-9001}:9001"
+      - '${S3_PORT:-9000}:9000'
+      - '${S3_CONSOLE_PORT:-9001}:9001'
     volumes:
       - minio-data:/data
     networks:
@@ -69,7 +67,7 @@ services:
     profiles:
       - local-storage
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      test: ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
       interval: 30s
       timeout: 20s
       retries: 3
@@ -77,7 +75,7 @@ services:
   valkey:
     image: valkey/valkey:7-alpine
     ports:
-      - "${VALKEY_PORT:-6379}:6379"
+      - '${VALKEY_PORT:-6379}:6379'
     volumes:
       - valkey-data:/data
     networks:
@@ -86,7 +84,7 @@ services:
     profiles:
       - cache
     healthcheck:
-      test: ["CMD", "valkey-cli", "ping"]
+      test: ['CMD', 'valkey-cli', 'ping']
       interval: 10s
       timeout: 3s
       retries: 3

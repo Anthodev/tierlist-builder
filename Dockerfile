@@ -10,8 +10,8 @@ WORKDIR /app
 
 # Install system dependencies for better compatibility
 RUN apk add --no-cache \
-    curl \
-    && rm -rf /var/cache/apk/*
+  curl \
+  && rm -rf /var/cache/apk/*
 
 COPY package.json bun.lock* ./
 
@@ -30,7 +30,7 @@ EXPOSE 3000
 
 # Health check for development
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:3000 || exit 1
+  CMD curl -f http://localhost:3000 || exit 1
 
 # Start development server with hot reload
 CMD ["bun", "run", "dev"]
@@ -55,15 +55,15 @@ ENV NODE_ENV=production
 
 # Create non-root user for security
 RUN addgroup -g 1001 -S nodejs \
-    && adduser -S bunuser -u 1001 -G nodejs
+  && adduser -S bunuser -u 1001 -G nodejs
 
 WORKDIR /app
 
 # Install only production system dependencies
 RUN apk add --no-cache \
-    curl \
-    tini \
-    && rm -rf /var/cache/apk/*
+  curl \
+  tini \
+  && rm -rf /var/cache/apk/*
 
 # Copy built application from builder stage
 COPY --from=builder --chown=bunuser:nodejs /app/dist ./dist
@@ -83,7 +83,7 @@ EXPOSE 3000
 
 # Health check for production
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-    CMD curl -f http://localhost:3000 || exit 1
+  CMD curl -f http://localhost:3000 || exit 1
 
 # Use tini as entrypoint for proper signal handling
 ENTRYPOINT ["/sbin/tini", "--"]
@@ -102,7 +102,7 @@ COPY . .
 
 # Run tests, linting, and type checking
 RUN bun run quality && \
-    bun run test --coverage --watchAll=false
+  bun run test --coverage --watchAll=false
 
 # Default command for testing
 CMD ["bun", "run", "test"]
